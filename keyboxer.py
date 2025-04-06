@@ -163,6 +163,7 @@ try:
 
     # Print message if no changes were made
     print("Checking if changes were made...", flush=True)
+    print(f"Final changes_made: {changes_made}", flush=True)  # Debug print
     if not changes_made:
         print("No changes were made to the files.", flush=True)
     else:
