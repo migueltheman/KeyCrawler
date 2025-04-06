@@ -29,6 +29,11 @@ headers = {
 
 save = Path(__file__).resolve().parent / "keys"
 cache_file = Path(__file__).resolve().parent / "cache.txt"
+
+# Ensure the cache file exists
+if not cache_file.exists():
+    cache_file.touch()
+
 cached_urls = set(open(cache_file, "r").readlines())
 
 # Track if any changes were made
@@ -50,7 +55,7 @@ def fetch_and_process_results(page):
                 raw_url: str = (
                     item["html_url"].replace("github.com", "raw.githubusercontent.com").replace("/blob/", "/")
                 )
-                # check if the file exists in cache
+                # Check if the file exists in cache
                 if raw_url + "\n" in cached_urls:
                     continue
                 else:
@@ -72,7 +77,7 @@ def fetch_and_process_results(page):
                     with open(file_name_save, "wb") as f:
                         f.write(file_content)
                     changes_made = True
-    return len(search_results["items"]) > 0  # Return True if there could be more results
+    return len(search_results.get("items", [])) > 0  # Return True if there could be more results
 
 
 # Function to fetch file content
@@ -91,8 +96,9 @@ while has_more:
     has_more = fetch_and_process_results(page)
     page += 1
 
-# update cache
-open(cache_file, "w").writelines(cached_urls)
+# Update cache
+with open(cache_file, "w") as f:
+    f.writelines(cached_urls)
 
 for file_path in save.glob("*.xml"):
     file_content = file_path.read_text()  # Read file content as a string
