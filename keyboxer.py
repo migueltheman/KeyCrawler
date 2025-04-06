@@ -43,6 +43,7 @@ changes_made = False
 # Function to fetch and print search results
 def fetch_and_process_results(page):
     global changes_made
+    print(f"Fetching results for page {page}...")  # Debug statement
     print(f"Fetching results for page {page}...", flush=True)  # Debug statement
     params = {"per_page": 100, "page": page}
     response = session.get(search_url, headers=headers, params=params)
@@ -85,7 +86,6 @@ def fetch_and_process_results(page):
 
 # Function to fetch file content
 def fetch_file_content(url: str):
-    print(f"Fetching file content from {url}...", flush=True)  # Debug statement
     response = session.get(url)
     if response.status_code == 200:
         return response.content
@@ -123,11 +123,6 @@ try:
             else:
                 print(f"Kept file: {file_path.name}", flush=True)
 
-    # Print message if no changes were made
-    if not changes_made:
-        print("No changes were made to the files.", flush=True)
-    else:
-        print("Changes were made.", flush=True)
-
-except Exception as e:
-    print(f"An error occurred: {e}", file=sys.stderr, flush=True)
+# Print message if no changes were made
+if not changes_made:
+    print("No new files or changes found.")
