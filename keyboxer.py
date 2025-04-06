@@ -2,6 +2,7 @@ import requests
 import hashlib
 import os
 import sys
+import traceback  # Import the traceback module
 
 from lxml import etree
 from pathlib import Path
@@ -131,3 +132,4 @@ try:
 
 except Exception as e:
     print(f"An error occurred: {e}", file=sys.stderr, flush=True)
+    traceback.print_exc(file=sys.stderr)  # Print the exception traceback to stderr
