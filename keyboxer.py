@@ -31,9 +31,12 @@ save = Path(__file__).resolve().parent / "keys"
 cache_file = Path(__file__).resolve().parent / "cache.txt"
 cached_urls = set(open(cache_file, "r").readlines())
 
+# Track if any changes were made
+changes_made = False
 
 # Function to fetch and print search results
 def fetch_and_process_results(page):
+    global changes_made
     params = {"per_page": 100, "page": page}
     response = session.get(search_url, headers=headers, params=params)
     if response.status_code != 200:
@@ -68,6 +71,7 @@ def fetch_and_process_results(page):
                     print(f"{raw_url} is new")
                     with open(file_name_save, "wb") as f:
                         f.write(file_content)
+                    changes_made = True
     return len(search_results["items"]) > 0  # Return True if there could be more results
 
 
@@ -100,7 +104,12 @@ for file_path in save.glob("*.xml"):
             try:
                 file_path.unlink()  # Delete the file
                 print(f"Deleted file: {file_path.name}")
+                changes_made = True
             except OSError as e:
                 print(f"Error deleting file {file_path.name}: {e}")
         else:
             print(f"Kept file: {file_path.name}")
+
+# Print message if no changes were made
+if not changes_made:
+    print("No new files or changes found.")

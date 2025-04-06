@@ -26,10 +26,9 @@ Hacked together really quick - making it public as now I use a stock ROM.
    cd KeyCrawler
    ```
 
-2. Install the required Python libraries using uv:
+2. Install the pre-requisites
    ```sh
-   uv venv
-   uv pip install -r requirements.txt
+   pip3 install requests lxml pathlib dotenv cryptography uv
    ```
 
 3. Create a `.env` file in the project directory and add your GitHub personal access token:
@@ -63,9 +62,7 @@ Hacked together really quick - making it public as now I use a stock ROM.
 ## License
 This project is licensed under the GPLv3 License.
 
-## Contributing
-Contributions are welcome! Feel free to fork the repository and submit pull requests.
-
 ## Acknowledgments
 - [KimmyXYC's KeyboxChecker](https://github.com/KimmyXYC/KeyboxChecker)
 - [TrickyStore](https://github.com/5ec1cff/TrickyStore)
+- [The actual dev of this](https://github.com/Magniquick/KeyCrawler)
