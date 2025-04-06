@@ -1,6 +1,7 @@
 import requests
 import hashlib
 import os
+import sys
 
 from lxml import etree
 from pathlib import Path
@@ -42,6 +43,7 @@ changes_made = False
 # Function to fetch and print search results
 def fetch_and_process_results(page):
     global changes_made
+    print(f"Fetching results for page {page}...", flush=True)  # Debug statement
     params = {"per_page": 100, "page": page}
     response = session.get(search_url, headers=headers, params=params)
     if response.status_code != 200:
@@ -66,6 +68,7 @@ def fetch_and_process_results(page):
                 try:
                     root = etree.fromstring(file_content)
                 except etree.XMLSyntaxError:
+                    print(f"Skipping invalid XML file: {raw_url}", flush=True)
                     continue
                 # Get the canonical form (C14N)
                 canonical_xml = etree.tostring(root, method="c14n")
@@ -73,7 +76,7 @@ def fetch_and_process_results(page):
                 hash_value = hashlib.sha256(canonical_xml).hexdigest()
                 file_name_save = save / (hash_value + ".xml")
                 if not file_name_save.exists() and file_content and CheckValid(file_content):
-                    print(f"{raw_url} is new")
+                    print(f"New file found: {raw_url}", flush=True)
                     with open(file_name_save, "wb") as f:
                         f.write(file_content)
                     changes_made = True
@@ -82,6 +85,7 @@ def fetch_and_process_results(page):
 
 # Function to fetch file content
 def fetch_file_content(url: str):
+    print(f"Fetching file content from {url}...", flush=True)  # Debug statement
     response = session.get(url)
     if response.status_code == 200:
         return response.content
@@ -89,33 +93,41 @@ def fetch_file_content(url: str):
         raise RuntimeError(f"Failed to download {url}")
 
 
-# Fetch all pages
-page = 1
-has_more = True
-while has_more:
-    has_more = fetch_and_process_results(page)
-    page += 1
+# Main logic
+try:
+    print("Starting the crawling process...", flush=True)
+    # Fetch all pages
+    page = 1
+    has_more = True
+    while has_more:
+        has_more = fetch_and_process_results(page)
+        page += 1
 
-# Update cache
-with open(cache_file, "w") as f:
-    f.writelines(cached_urls)
+    # Update cache
+    with open(cache_file, "w") as f:
+        f.writelines(cached_urls)
 
-for file_path in save.glob("*.xml"):
-    file_content = file_path.read_text()  # Read file content as a string
-    # Run CheckValid to determine if the file is still valid
-    if not CheckValid(file_content):
-        # Prompt user for deletion
-        user_input = input(f"File '{file_path.name}' is no longer valid. Do you want to delete it? (y/N): ")
-        if user_input.lower() == "y":
-            try:
-                file_path.unlink()  # Delete the file
-                print(f"Deleted file: {file_path.name}")
-                changes_made = True
-            except OSError as e:
-                print(f"Error deleting file {file_path.name}: {e}")
-        else:
-            print(f"Kept file: {file_path.name}")
+    for file_path in save.glob("*.xml"):
+        file_content = file_path.read_text()  # Read file content as a string
+        # Run CheckValid to determine if the file is still valid
+        if not CheckValid(file_content):
+            # Prompt user for deletion
+            user_input = input(f"File '{file_path.name}' is no longer valid. Do you want to delete it? (y/N): ")
+            if user_input.lower() == "y":
+                try:
+                    file_path.unlink()  # Delete the file
+                    print(f"Deleted file: {file_path.name}", flush=True)
+                    changes_made = True
+                except OSError as e:
+                    print(f"Error deleting file {file_path.name}: {e}", flush=True)
+            else:
+                print(f"Kept file: {file_path.name}", flush=True)
 
-# Print message if no changes were made
-if not changes_made:
-    print("No new files or changes found.")
+    # Print message if no changes were made
+    if not changes_made:
+        print("No changes were made to the files.", flush=True)
+    else:
+        print("Changes were made.", flush=True)
+
+except Exception as e:
+    print(f"An error occurred: {e}", file=sys.stderr, flush=True)
