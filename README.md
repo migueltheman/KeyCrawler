@@ -1,5 +1,8 @@
 # KeyCrawler 🔑
 
+# WARNING - YOU ARE IN THE DEBUG/TEST BRANCH
+   Weird and untested stuff goes on here. You are not safe from buggy, messy or even harmful code in this branch. [Go back to safety.](https://github.com/migueltheman/KeyCrawler/tree/main)
+
 ## Overview
 **KeyCrawler** is a Python project designed to fetch, validate, and manage `keybox.xml` files from GitHub. This project is specifically intended to work with [TrickyStore](https://github.com/5ec1cff/TrickyStore), a tool for modifying certificate chains in Android Key Attestation to pass integrity checks.
 
