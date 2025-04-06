@@ -42,6 +42,7 @@ changes_made = False
 # Function to fetch and print search results
 def fetch_and_process_results(page):
     global changes_made
+    print(f"Fetching results for page {page}...")  # Debug statement
     params = {"per_page": 100, "page": page}
     response = session.get(search_url, headers=headers, params=params)
     if response.status_code != 200:
@@ -82,6 +83,7 @@ def fetch_and_process_results(page):
 
 # Function to fetch file content
 def fetch_file_content(url: str):
+    print(f"Fetching file content from {url}...")  # Debug statement
     response = session.get(url)
     if response.status_code == 200:
         return response.content
@@ -118,4 +120,4 @@ for file_path in save.glob("*.xml"):
 
 # Print message if no changes were made
 if not changes_made:
-    print("No new files or changes found.")
+    print("No changes were made to the files.")
